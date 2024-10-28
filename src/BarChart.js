@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select'; // Import the Select component from react-select
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Cell, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend } from 'recharts';
 import Papa from 'papaparse';
 import './BarChart.css';
 
@@ -30,7 +30,6 @@ const CsvChart = () => {
     const [data, setData] = useState([]);
     const [filteredTXData, setFilteredTXData] = useState([]);
     const [filteredRegionalData, setFilteredRegionalData] = useState([]);
-    const [chartType, setChartType] = useState('bar');
     const [peakTimesTX, setPeakTimesTX] = useState({});
     const [peakTimesRegional, setPeakTimesRegional] = useState({});
     const [showPeakTimes, setShowPeakTimes] = useState(false); // State to manage visibility of peak times
@@ -191,53 +190,16 @@ const CsvChart = () => {
         return formattedData;
     };
 
-    // Toggle between Bar and Line chart
-    const toggleChartType = () => {
-        setChartType(chartType === 'bar' ? 'line' : 'bar');
-    };
 
     const togglePeakTimes = () => {
         setShowPeakTimes(prevShowPeakTimes => !prevShowPeakTimes);
     };
 
-    // Aggregate data for bar charts (total trips per line)
-    const prepareBarChartData = (filteredData) => {
-        return filteredData.map((item) => {
-            // For each line, sum up all trips across all timestamps
-            const totalTrips = Object.keys(item)
-                .filter(key => key !== 'Line')  // Exclude the 'Line' key
-                .reduce((sum, timestamp) => sum + item[timestamp], 0);
-
-            return {
-                Line: item.Line,
-                Trip: totalTrips,
-            };
-        });
-    };
-
-
 
 
     const renderChart = (data, title, lines) => {
         const filteredLines = lines.filter(line => selectedLines.includes(line)); // Filter by selected lines
-        if (chartType === 'bar') {
-            const barData = prepareBarChartData(data.filter(item => selectedLines.includes(item.Line)));
-            return (
-                <ResponsiveContainer width="100%" height={450}>
-                    <BarChart data={barData} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="Line" angle={-45} textAnchor="end" interval={0} tick={{ fontSize: 12 }} />
-                        <YAxis tick={{ fontSize: 12 }} />
-                        <Tooltip />
-                        <Bar dataKey="Trip" isAnimationActive={false}>
-                            {barData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={lineColors[entry.Line] || '#82ca9d'} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-            );
-        } else {
+
             const lineData = prepareLineChartData(filteredLines);
             return (
                 <ResponsiveContainer width="100%" height="100%">
@@ -253,7 +215,7 @@ const CsvChart = () => {
                     </LineChart>
                 </ResponsiveContainer>
             );
-        }
+
     };
 
     // Peak Times Display with selected lines
@@ -289,6 +251,23 @@ const CsvChart = () => {
         </div>
     );
 
+    const calculateTotalTrips = () => {
+        return selectedLines.map(line => {
+            const totalTrips = data
+                .filter(item => item.Line === line)
+                .reduce((sum, item) => sum + (parseInt(item.Trip) || 0), 0);
+
+            return { line, tripCount: totalTrips };
+        });
+    };
+
+    const lineTripData = calculateTotalTrips();
+
+    // Define function to check if there's any data in the filtered datasets
+    const hasData = (filteredData, selectedLines) => {
+        return filteredData.some(item => selectedLines.includes(item.Line) && Object.values(item).some(value => typeof value === 'number' && value > 0));
+    };
+
 
     return (
         <div className="csv-chart-container">
@@ -302,25 +281,57 @@ const CsvChart = () => {
                 className="multi-select-dropdown"
             />
 
-            {/* Only render buttons and charts if selectedLines is not empty */}
             {selectedLines.length > 0 ? (
                 <>
-                    {/* Toggle chart type button */}
                     <div>
-                        <button onClick={toggleChartType}>
-                            Toggle to {chartType === 'bar' ? 'Line Chart' : 'Bar Chart'}
-                        </button>
+                        <table className="trips-table">
+                            <thead>
+                                <tr>
+                                    <th>Line</th>
+                                    <th>Trips</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {lineTripData.map((item, index) => (
+                                    <tr
+                                        key={index}
+                                        style={{
+                                            backgroundColor: `${lineColors[item.line]}`,
+                                            color: 'black',
+                                            opacity: 0.8,
+                                        }}
+                                    >
+                                        <td>{item.line}</td>
+                                        <td>{item.tripCount}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
 
                     <div className="charts-container">
-                        <div className="chart-wrapper">
-                            <h3>Trips by Selected Sydney Lines</h3>
-                            {renderChart(filteredTXData, 'Trips by Sydney Lines', Object.keys(lineColors).filter(line => line.startsWith('T')))}
-                        </div>
-                        <div className="chart-wrapper">
-                            <h3>Trips by Selected Regional Lines</h3>
-                            {renderChart(filteredRegionalData, 'Trips by Regional Lines', Object.keys(lineColors).filter(line => !line.startsWith('T')))}
-                        </div>
+                        {hasData(filteredTXData, selectedLines) && hasData(filteredRegionalData, selectedLines) ? (
+                            <>
+                                <div className="chart-wrapper">
+                                    <h3>Trips by Selected Sydney Lines</h3>
+                                    {renderChart(filteredTXData, 'Trips by Sydney Lines', Object.keys(lineColors).filter(line => line.startsWith('T')))}
+                                </div>
+                                <div className="chart-wrapper">
+                                    <h3>Trips by Selected Regional Lines</h3>
+                                    {renderChart(filteredRegionalData, 'Trips by Regional Lines', Object.keys(lineColors).filter(line => !line.startsWith('T')))}
+                                </div>
+                            </>
+                        ) : hasData(filteredTXData, selectedLines) ? (
+                            <div className="chart-wrapper full-width">
+                                <h3>Trips by Selected Sydney Lines</h3>
+                                {renderChart(filteredTXData, 'Trips by Sydney Lines', Object.keys(lineColors).filter(line => line.startsWith('T')))}
+                            </div>
+                        ) : hasData(filteredRegionalData, selectedLines) ? (
+                            <div className="chart-wrapper full-width">
+                                <h3>Trips by Selected Regional Lines</h3>
+                                {renderChart(filteredRegionalData, 'Trips by Regional Lines', Object.keys(lineColors).filter(line => !line.startsWith('T')))}
+                            </div>
+                        ) : null}
                     </div>
 
                     <div>

@@ -10,7 +10,7 @@
     justify-content: space-between;
     align-items: flex-start; /* Align items to the top */
     gap: 20px;
-    overflow-y: hidden; /* Disable vertical scrolling */
+    overflow: hidden; /* Completely disable scrolling */
 }
 
 .chart-wrapper {
@@ -19,7 +19,13 @@
     min-width: 500px;
     height: 450px;
     padding-bottom: 100px; /* Increased padding below the chart to avoid cutting off X-axis labels */
+    overflow: hidden; /* Completely disable scrolling */
 }
+
+    /* CSS to style full-width chart */
+    .chart-wrapper.full-width {
+        width: 100%;
+    }
 
 /* Peak times container to separate from charts */
 .peak-times-container {
@@ -84,6 +90,55 @@
         background-color: #0056b3;
     }
 
+.trips-table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+}
+
+    .trips-table th,
+    .trips-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .trips-table th {
+        background-color: rgba(242, 242, 242, 0.8); /* Slight opacity for header background */
+    }
+
+    /* Alternating row colors */
+    .trips-table tbody tr:nth-child(odd) {
+        background-color: rgba(249, 249, 249, 0.7); /* Lighter shade with opacity */
+    }
+
+    .trips-table tbody tr:nth-child(even) {
+        background-color: rgba(224, 224, 224, 0.7); /* Darker shade with opacity */
+    }
+
+/* Container for the dropdown options */
+.dropdown-options {
+    position: absolute; /* Allows it to be positioned relative to the nearest positioned ancestor */
+    z-index: 1000; /* Ensures it appears above other elements */
+    background-color: white; /* Set a background color for visibility */
+    border: 1px solid #ccc; /* Optional: border for better visibility */
+    border-radius: 5px; /* Optional: rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Optional: shadow for depth */
+    max-height: 300px; /* Optional: max height for scrolling */
+    overflow-y: auto; /* Enable scrolling if too many options */
+    width: 100%; /* Make it the same width as the dropdown */
+    margin-top: 2px; /* Space between dropdown and options */
+}
+
+/* Styling for individual dropdown options */
+.dropdown-option {
+    padding: 10px; /* Spacing for options */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+    .dropdown-option:hover {
+        background-color: #f0f0f0; /* Highlight on hover */
+    }
+
 /* Media query for mobile devices */
 @media (max-width: 768px) {
     /* Prevent horizontal scrolling */
@@ -101,10 +156,17 @@
         max-width: 1200px;
         min-width: 300px;
         height: 450px;
-        margin-bottom: 80px; /* Add extra padding below the chart */
+        margin-bottom: 20px; /* Add extra padding below the chart */
     }
 
+    /* Styling for multi-select dropdown */
     .multi-select-dropdown {
-        max-width: 100%;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f0f0f0;
     }
 }
