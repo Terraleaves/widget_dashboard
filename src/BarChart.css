@@ -8,8 +8,9 @@
 .charts-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start; /* Align items to the top */
     gap: 20px;
+    overflow-y: hidden; /* Disable vertical scrolling */
 }
 
 .chart-wrapper {
@@ -17,7 +18,7 @@
     max-width: 1200px;
     min-width: 500px;
     height: 450px;
-    padding-bottom: 80px; /* Add extra padding below the chart */
+    padding-bottom: 100px; /* Increased padding below the chart to avoid cutting off X-axis labels */
 }
 
 /* Peak times container to separate from charts */
@@ -85,7 +86,13 @@
 
 /* Media query for mobile devices */
 @media (max-width: 768px) {
+    /* Prevent horizontal scrolling */
+    body {
+        overflow-x: hidden; /* Hides horizontal scrollbar */
+    }
+
     .charts-container {
+        overflow-x: hidden; /* Additional safeguard for the container */
         flex-direction: column;
     }
 
@@ -94,7 +101,7 @@
         max-width: 1200px;
         min-width: 300px;
         height: 450px;
-        padding-bottom: 80px; /* Add extra padding below the chart */
+        margin-bottom: 80px; /* Add extra padding below the chart */
     }
 
     .multi-select-dropdown {

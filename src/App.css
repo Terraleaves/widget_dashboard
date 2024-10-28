@@ -17,6 +17,7 @@
 
 @media (max-width: 768px) {
     .csv-chart-container, .chart-wrapper {
+        overflow-x: hidden;
         padding: 5px;
     }
 }

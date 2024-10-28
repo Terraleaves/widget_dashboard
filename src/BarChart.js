@@ -36,6 +36,22 @@ const CsvChart = () => {
     const [showPeakTimes, setShowPeakTimes] = useState(false); // State to manage visibility of peak times
     const [selectedLines, setSelectedLines] = useState([]); // New state for selected lines
 
+    const s3Url = 'https://devops-widget-wsu-2024.s3.ap-southeast-2.amazonaws.com/traintimes.csv';
+
+    // Fetch CSV data from S3
+    useEffect(() => {
+        fetch(s3Url)
+            .then(response => response.text())
+            .then(csvData => {
+                Papa.parse(csvData, {
+                    header: true,
+                    complete: (result) => {
+                        setData(result.data);
+                    },
+                });
+            })
+            .catch(error => console.error('Error fetching the CSV file:', error));
+    }, []);
 
     // Options for the line dropdown
     const lineOptions = Object.keys(lineColors).map(line => ({
@@ -69,19 +85,6 @@ const CsvChart = () => {
         setSelectedLines(selectedOptions ? selectedOptions.map(option => option.value) : []);
     };
 
-    // Parse CSV file
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            Papa.parse(file, {
-                header: true,
-                complete: (result) => {
-                    const parsedData = result.data;
-                    setData(parsedData);
-                },
-            });
-        }
-    };
 
     // Group data by line and hour
     const groupDataByLineAndHour = (filteredData) => {
@@ -290,11 +293,6 @@ const CsvChart = () => {
     return (
         <div className="csv-chart-container">
             <h2>Trips by Line</h2>
-            {/* File Upload */}
-            <div>
-                <input type="file" accept=".csv" onChange={handleFileUpload} />
-            </div>
-            {/* Line Selector */}
             <Select
                 isMulti
                 options={lineOptions}
@@ -303,31 +301,41 @@ const CsvChart = () => {
                 styles={customStyles}
                 className="multi-select-dropdown"
             />
-            {/* Toggle chart type button */}
-            <div>
-                <button onClick={toggleChartType}>
-                    Toggle to {chartType === 'bar' ? 'Line Chart' : 'Bar Chart'}
-                </button>
-            </div>
-            {/* TX Lines Chart */}
-            <div className="charts-container">
-                <div className="chart-wrapper">
-                    <h3>Trips by Selected Sydney Lines</h3>
-                    {renderChart(filteredTXData, 'Trips by Sydney Lines', Object.keys(lineColors).filter(line => line.startsWith('T')))}
+
+            {/* Only render buttons and charts if selectedLines is not empty */}
+            {selectedLines.length > 0 ? (
+                <>
+                    {/* Toggle chart type button */}
+                    <div>
+                        <button onClick={toggleChartType}>
+                            Toggle to {chartType === 'bar' ? 'Line Chart' : 'Bar Chart'}
+                        </button>
+                    </div>
+
+                    <div className="charts-container">
+                        <div className="chart-wrapper">
+                            <h3>Trips by Selected Sydney Lines</h3>
+                            {renderChart(filteredTXData, 'Trips by Sydney Lines', Object.keys(lineColors).filter(line => line.startsWith('T')))}
+                        </div>
+                        <div className="chart-wrapper">
+                            <h3>Trips by Selected Regional Lines</h3>
+                            {renderChart(filteredRegionalData, 'Trips by Regional Lines', Object.keys(lineColors).filter(line => !line.startsWith('T')))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <button onClick={togglePeakTimes} className="toggle-peak-times-btn">
+                            {showPeakTimes ? 'Hide Peak Times' : 'Show Peak Times'}
+                        </button>
+                    </div>
+
+                    {showPeakTimes && renderPeakTimes()}
+                </>
+            ) : (
+                <div>
+                    <p>Please select at least one line to display the charts and peak times.</p>
                 </div>
-                <div className="chart-wrapper">
-                    <h3>Trips by Selected Regional Lines</h3>
-                    {renderChart(filteredRegionalData, 'Trips by Regional Lines', Object.keys(lineColors).filter(line => !line.startsWith('T')))}
-                </div>
-            </div>
-            {/* Toggle peak times button */}
-            <div>
-                <button onClick={togglePeakTimes} className="toggle-peak-times-btn">
-                    {showPeakTimes ? 'Hide Peak Times' : 'Show Peak Times'}
-                </button>
-            </div>
-            {/* Peak Times Display */}
-            {showPeakTimes && renderPeakTimes()}
+            )}
         </div>
     );
 };
