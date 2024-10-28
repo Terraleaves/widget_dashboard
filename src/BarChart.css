@@ -1,0 +1,103 @@
+/* Container for entire chart and filter area */
+.csv-chart-container {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* Wrapper for both line and bar charts */
+.charts-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.chart-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    min-width: 500px;
+    height: 450px;
+    padding-bottom: 80px; /* Add extra padding below the chart */
+}
+
+/* Peak times container to separate from charts */
+.peak-times-container {
+    margin-top: 20px;
+}
+
+/* Grid layout for peak times items */
+.peak-times-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+/* Individual item styling within the peak times grid */
+.peak-times-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    transition: box-shadow 0.2s;
+}
+
+    .peak-times-item:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+/* Font styling for peak times grid items */
+.peak-times-line {
+    font-weight: bold;
+}
+
+.peak-times-trips {
+    color: #555;
+}
+
+/* Styling for multi-select dropdown */
+.multi-select-dropdown {
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
+
+/* Additional adjustment to ensure space for toggle button */
+.toggle-peak-times-btn {
+    margin-top: 20px; /* Space above the button */
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .toggle-peak-times-btn:hover {
+        background-color: #0056b3;
+    }
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .charts-container {
+        flex-direction: column;
+    }
+
+    .chart-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        min-width: 300px;
+        height: 450px;
+        padding-bottom: 80px; /* Add extra padding below the chart */
+    }
+
+    .multi-select-dropdown {
+        max-width: 100%;
+    }
+}
