@@ -35,7 +35,7 @@ const CsvChart = () => {
     const [showPeakTimes, setShowPeakTimes] = useState(false); // State to manage visibility of peak times
     const [selectedLines, setSelectedLines] = useState([]); // New state for selected lines
 
-    const s3Url = 'https://devops-widget-wsu-2024.s3.ap-southeast-2.amazonaws.com/traintimes.csv';
+    const s3Url = 'https://wsu-widget-bucket-2024.s3.ap-southeast-2.amazonaws.com/traintimes.csv';
 
     // Fetch CSV data from S3
     useEffect(() => {
