@@ -146,6 +146,11 @@
         overflow-x: hidden; /* Hides horizontal scrollbar */
     }
 
+    .csv-chart-container, .trips-table {
+        max-width: 90%; /* or another desired value */
+        margin: 0 auto;
+    }
+
     .charts-container {
         overflow-x: hidden; /* Additional safeguard for the container */
         flex-direction: column;
@@ -161,12 +166,13 @@
 
     /* Styling for multi-select dropdown */
     .multi-select-dropdown {
-        width: 100%;
-        max-width: 300px;
-        margin: 10px auto;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f0f0f0;
+        width: 90%; /* Use a smaller percentage to fit the screen */
+        max-width: none; /* Remove max-width to allow full flexibility */
+        margin: 10px auto; /* Center the dropdown */
+    }
+
+    .dropdown-options {
+        width: 90%; /* Adjust width of options to match dropdown */
+        margin-top: 2px;
     }
 }
